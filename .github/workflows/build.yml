@@ -25,11 +25,11 @@ on:
    gcc_var:
     description: 'AOSP or Eva GCC'
     required: true
-    default: 'AOSP GCC'
+    default: 'AOSP'
     type: choice
     options:
-    - AOSP GCC
-    - Eva GCC
+    - AOSP
+    - Eva
    clang_ver:
     description: 'Clang version'
     required: true
@@ -71,7 +71,7 @@ jobs:
       mkdir -p $GITHUB_WORKSPACE/build
             
    - name: Download AOSP GCC
-     if: ${{ inputs.gcc_var }} == 'AOSP GCC'
+     if: ${{ inputs.gcc_var }} == 'AOSP'
      run: |
       cd $GITHUB_WORKSPACE/build
       mkdir aosp-gcc
@@ -84,7 +84,7 @@ jobs:
       TARGET32=arm-linux-android- >> $GITHUB_ENV
       
    - name: Download Eva GCC
-     if: ${{ inputs.gcc_var }} == 'Eva GCC'
+     if: ${{ inputs.gcc_var }} == 'Eva'
      run: |
       cd $GITHUB_WORKSPACE/build
       wget https://github.com/mvaisakh/gcc-arm64/archive/gcc-master.zip
