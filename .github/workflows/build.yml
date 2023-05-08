@@ -1,47 +1,47 @@
-name
+name: Build Android Kernel
 on:
-    workflow_dispatch:
-        inputs:
-            kernel_url:
-                description: 'Kernel URL'
-                required: true
-                default: 'https://github.com/baisyu92/kernel_xiaomi_vayu.git'
-                type: string
-            config_name:
-                description: 'Device defconfig'
-                required: true
-                default: 'vayu_defconfig'
-                type: string
-            boot_format:
-                description: 'Boot format'
-                required: true
-                default: 'Image'
-                type: string
-            gcc_var:
-                description: 'AOSP or Eva GCC'
-                required: true
-                default: 'AOSP GCC'
-                type: choice
-                options:
-                - AOSP GCC
-                - Eva GCC
-            clang_ver:
-                description: 'Clang version'
-                required: true
-                default: 'r487747b'
-                type: string
-            extra_build_cmd:
-                description: 'Extra build commands'
-                required: true
-                default: 'CC=clang'
-            add_kernelsu:
-                description: 'Add KernelSU'
-                required: false
-                type: choice
-                options:
-                - 
-                - stable
-                - Dev
+ workflow_dispatch:
+  inputs:
+   kernel_url:
+    description: 'Kernel URL'
+    required: true
+    default: 'https://github.com/baisyu92/kernel_xiaomi_vayu.git'
+    type: string
+   config_name:
+    description: 'Device defconfig'
+    required: true
+    default: 'vayu_defconfig'
+    type: string
+   boot_format:
+    description: 'Boot format'
+    required: true
+    default: 'Image'
+    type: string
+   gcc_var:
+    description: 'AOSP or Eva GCC'
+    required: true
+    default: 'AOSP GCC'
+    type: choice
+    options:
+    - AOSP GCC
+    - Eva GCC
+   clang_ver:
+    description: 'Clang version'
+    required: true
+    default: 'r487747b'
+    type: string
+   extra_build_cmd:
+    description: 'Extra build commands'
+    required: true
+    default: 'CC=clang'
+   add_kernelsu:
+    description: 'Add KernelSU'
+    required: false
+    type: choice
+    options:
+    - 
+    - stable
+    - Dev
 
 jobs:
  Build Kernel:
