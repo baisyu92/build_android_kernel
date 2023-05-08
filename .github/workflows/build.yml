@@ -23,9 +23,13 @@ on:
     default: 'Image'
     type: string
    gcc_var:
-    description: 'Use Eva GCC'
-    required: false
-    type: boolean
+    description: 'AOSP or Eva GCC'
+    required: true
+    default: 'AOSP GCC'
+    type: choice
+    options:
+    - AOSP GCC
+    - Eva GCC
    clang_ver:
     description: 'Clang version'
     required: true
@@ -67,7 +71,7 @@ jobs:
       mkdir -p $GITHUB_WORKSPACE/build
             
    - name: Download AOSP GCC
-     if: ${{ inputs.gcc_var }} == 'false'
+     if: inputs.gcc_var == 'AOSP GCC'
      run: |
       cd $GITHUB_WORKSPACE/build
       mkdir aosp-gcc
@@ -80,14 +84,14 @@ jobs:
       TARGET32=arm-linux-android- >> $GITHUB_ENV
       
    - name: Download Eva GCC
-     if: ${{ inputs.gcc_var }} == 'true'
+     if: inputs.gcc_var == 'Eva GCC'
      run: |
       cd $GITHUB_WORKSPACE/build
       wget https://github.com/mvaisakh/gcc-arm64/archive/gcc-master.zip
       unzip gcc-master.zip && mv gcc-arm64-gcc-master gcc
       rm -rf gcc-master.zip
       wget https://github.com/mvaisakh/gcc-arm/archive/gcc-master.zip
-      unzip gcc-master.zip && mv gcc-arm-gcc-master gcc32
+      unzip gcc-master.zip && gcc-arm-gcc-master gcc32
       rm -rf gcc-master.zip
       TARGET=aarch64-elf- >> $GITHUB_ENV
       TARGET32=arm-eabi- >> $GITHUB_ENV
