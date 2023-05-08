@@ -1,0 +1,68 @@
+name: Build Kernel
+on:
+    workflow_dispatch:
+        inputs:
+            kernel_url:
+                description: 'Kernel URL'
+                required: true
+                default: 'https://github.com/baisyu92/kernel_xiaomi_vayu.git'
+                type: string
+            config_name:
+                description: 'Device defconfig'
+                required: true
+                default: 'vayu_defconfig'
+                type: string
+            boot_format:
+                description: 'Boot format'
+                required: true
+                default: 'Image'
+                type: string
+            gcc_var:
+                description: 'AOSP or Eva GCC'
+                required: true
+                default: 'AOSP GCC'
+                type: choice
+                options:
+                - AOSP GCC
+                - Eva GCC
+            custom_clang:
+                description: 'Custom Clang'
+                required: false
+                type: boolean
+            clang_ver:
+                description: 'Clang version'
+                required: true
+                default: 'r487747b'
+                type: string
+            clang_triple:
+                description: 'CLANG_TRIPLE'
+                required: true
+                default: 'aarch64-linux-gnu-'
+                type: string
+            extra_build_cmd:
+                description: 'Extra build commands'
+                required: true
+                default: 'CC=clang'
+            add_kernelsu:
+                description: 'Add KernelSU'
+                required: false
+                default: ''
+                type: choice
+                options:
+                - 
+                - stable
+                - Dev
+
+jobs:
+    Build Kernel:
+        runs-on: ubuntu-latest
+        steps:
+            - user: actions/checkout@v3
+            - run: |
+                    echo "TIME=$(TZ=Asia/Taipei date "+%y%m%d%H%M")" >> GITHUB_ENV
+                    sudo apt update && sudo apt upgrade -y
+                    sudo apt install git ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev g++-multilib libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip device-tree-compiler python2 python3 gcc-12 g++-12
+                    mkdir -p $GITHUB_WORKSPACE/kernel
+            
+            - name: Download Compilers
+              if:
