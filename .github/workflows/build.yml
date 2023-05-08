@@ -91,7 +91,7 @@ jobs:
       unzip gcc-master.zip && mv gcc-arm64-gcc-master gcc
       rm -rf gcc-master.zip
       wget https://github.com/mvaisakh/gcc-arm/archive/gcc-master.zip
-      unzip gcc-master.zip && gcc-arm-gcc-master gcc32
+      unzip gcc-master.zip && mv gcc-arm-gcc-master gcc32
       rm -rf gcc-master.zip
       TARGET=aarch64-elf- >> $GITHUB_ENV
       TARGET32=arm-eabi- >> $GITHUB_ENV
