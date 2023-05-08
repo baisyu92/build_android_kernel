@@ -45,7 +45,7 @@ on:
     - Dev
 
 jobs:
- Build Kernel:
+ build_kernel:
   runs-on: ubuntu-latest
   steps:
    - name Setup
