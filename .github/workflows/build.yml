@@ -109,13 +109,13 @@ jobs:
       git clone -b ${{ inputs.branch }} ${{ inputs.kernel_url }} kernel
       
    - name: Add KernelSU (Stable)
-     if: ${{ inputs.add_kernelsu }} == 'Stable'
+     if: inputs.add_kernelsu == 'Stable'
      run: |
       cd $GITHUB_WORKSPACE/build/kernel
       curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
       
    - name: Add KernelSU (Dev)
-     if: ${{inputs.add_kernelsu }} == 'Dev'
+     if: inputs.add_kernelsu == 'Dev'
      run: |
       cd $GITHUB_WORKSPACE/build/kernel
       curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
