@@ -55,6 +55,33 @@ jobs:
       sudo apt install git ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev g++-multilib libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip device-tree-compiler python2 python3 gcc-12 g++-12
       mkdir -p $GITHUB_WORKSPACE/kernel
             
-   - name: Download Compilers
-     if: 
+   - name: Download AOSP GCC
+     if: ${{ inputs.gcc_var }} == 'AOSP GCC'
      run: |
+      cd $GITHUB_WORKSPACE/kernel
+      mkdir aosp-gcc
+      wget https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/+archive/0a0604336d4d1067aa1aaef8d3779b31fcee841d.tar.gz
+      tar -zxvf 0a0604336d4d1067aa1aaef8d3779b31fcee841d.tar.gz -C aosp-gcc
+      mkdir aosp-gcc32
+      wget https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/+archive/4d16d93f49c2b5ecdd0f12c38d194835dd595603.tar.gz
+      tar -zxvf 4d16d93f49c2b5ecdd0f12c38d194835dd595603.tar.gz -C aosp-gcc32
+      
+   - name: Download Eva GCC
+     if: ${{ inputs.gcc_var }} == 'Eva GCC'
+     run: |
+      cd $GITHUB_WORKSPACE/kernel
+      wget https://github.com/mvaisakh/gcc-arm64/archive/gcc-master.zip
+      unzip gcc-master.zip && mv gcc-arm64-gcc-master eva-gcc
+      rm -rf gcc-master.zip
+      wget https://github.com/mvaisakh/gcc-arm/archive/gcc-master.zip
+      unzip gcc-master.zip && gcc-arm-gcc-master eva-gcc32
+      rm -rf gcc-master.zip
+      
+   - name: Download Clang
+     run: |
+      cd $GITHUB_WORKSPACE/kernel
+      mkdir clang
+      wget https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-${{ inputs.clang_ver }}.tar.gz
+      tar -zxvf clang-${{ inputs.clang_ver }}.tar.gz -C clang
+      
+   - name:
