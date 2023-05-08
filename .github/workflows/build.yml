@@ -1,5 +1,4 @@
 name: Build Android Kernel
-run-name: Build Kernel
 on:
  workflow_dispatch:
   inputs:
