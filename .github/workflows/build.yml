@@ -129,7 +129,6 @@ jobs:
       make -j$(nproc --all) 0=out ARCH=arm64 ${{ inputs.extra_build_cmd }} CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=$GITHUB_WORKSPACE/build/gcc/bin/$TARGET
       
    - name: Make Anykernel3
-     if: env.CHECK_FILE_IS_OK == 'true'
      run: |
       cd $GITHUB_WORKSPACE/build
       git clone https://github.com/osm0sis/AnyKernel3
@@ -141,7 +140,6 @@ jobs:
       rm -rf AnyKernel3/.git* AnyKernel3/README.md
       
    - name: Upload AnyKernel3
-     if: env.CHECK_FILE_IS_OK == 'true'
      uses: actions/upload-artifact@v3
      with:
       name: AnyKernel3-${{ TIME }}
