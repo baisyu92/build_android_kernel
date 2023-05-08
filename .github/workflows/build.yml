@@ -45,8 +45,16 @@ on:
     type: choice
     options:
     - 
-    - stable
+    - Stable
     - Dev
+   need_arm32:
+    description: 'CROSS_COMPILE_ARM32'
+    required: true
+    default: 'false'
+    type: choice
+    options:
+    - true
+    - false
 
 jobs:
  build_kernel:
@@ -58,6 +66,8 @@ jobs:
       echo "TIME=$(TZ=Asia/Taipei date "+%y%m%d%H%M")" >> GITHUB_ENV
       sudo apt update && sudo apt upgrade -y
       sudo apt install git ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev g++-multilib libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip device-tree-compiler python2 python3 gcc-12 g++-12
+      sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 100
+      sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 100
       mkdir -p $GITHUB_WORKSPACE/build
             
    - name: Download AOSP GCC
@@ -70,17 +80,21 @@ jobs:
       mkdir aosp-gcc32
       wget https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9/+archive/4d16d93f49c2b5ecdd0f12c38d194835dd595603.tar.gz
       tar -zxvf 4d16d93f49c2b5ecdd0f12c38d194835dd595603.tar.gz -C aosp-gcc32
+      TARGET=aarch64-linux-android- >> $GITHUB_ENV
+      TARGET32=arm-linux-android- >> $GITHUB_ENV
       
    - name: Download Eva GCC
      if: ${{ inputs.gcc_var }} == 'Eva GCC'
      run: |
       cd $GITHUB_WORKSPACE/build
       wget https://github.com/mvaisakh/gcc-arm64/archive/gcc-master.zip
-      unzip gcc-master.zip && mv gcc-arm64-gcc-master eva-gcc
+      unzip gcc-master.zip && mv gcc-arm64-gcc-master gcc
       rm -rf gcc-master.zip
       wget https://github.com/mvaisakh/gcc-arm/archive/gcc-master.zip
-      unzip gcc-master.zip && gcc-arm-gcc-master eva-gcc32
+      unzip gcc-master.zip && gcc-arm-gcc-master gcc32
       rm -rf gcc-master.zip
+      TARGET=aarch64-elf- >> $GITHUB_ENV
+      TARGET32=arm-eabi- >> $GITHUB_ENV
       
    - name: Download Clang
      run: |
@@ -94,4 +108,41 @@ jobs:
       cd $GITHUB_WORKSPACE/build
       git clone -b ${{ inputs.branch }} ${{ inputs.kernel_url }} kernel
       
+   - name: Add KernelSU (Stable)
+     if: ${{ inputs.add_kernelsu }} == 'Stable'
+     run: |
+      cd $GITHUB_WORKSPACE/build/kernel
+      curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -
       
+   - name: Add KernelSU (Dev)
+     if: ${{inputs.add_kernelsu }} == 'Dev'
+     run: |
+      cd $GITHUB_WORKSPACE/build/kernel
+      curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
+      
+   - name: Build Kernel
+     run: |
+      cd $GITHUB_WORKSPACE/build/kernel
+      PATH=$GITHUB_WORKSPACE/build/clang/bin:$GITHUB_WORKSPACE/build/gcc/bin:$GITHUB_WORKSPACE/build/gcc32/bin:${PATH}
+      make clean && make mrproper
+      make -j$(nproc --all) 0=out ARCH=arm64 ${{ inputs.extra_build_cmd }} CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=$GITHUB_WORKSPACE/build/gcc/bin/$TARGET ${{ inputs.config }}
+      make -j$(nproc --all) 0=out ARCH=arm64 ${{ inputs.extra_build_cmd }} CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=$GITHUB_WORKSPACE/build/gcc/bin/$TARGET
+      
+   - name: Make Anykernel3
+     if: env.CHECK_FILE_IS_OK == 'true'
+     run: |
+      cd $GITHUB_WORKSPACE/build
+      git clone https://github.com/osm0sis/AnyKernel3
+      sed -i 's/do.devicecheck=1/do.devicecheck=0/g' AnyKernel3/anykernel.sh
+      sed -i 's!block=/dev/block/platform/omap/omap_hsmmc.0/by-name/boot;!block=auto;!g' AnyKernel3/anykernel.sh
+      sed -i 's/is_slot_device=0;/is_slot_device=auto;/g' AnyKernel3/anykernel.sh
+      cp kernel/arch/arm64/boot/${{ inputs.boot_format }} AnyKernel3/
+      cp android-kernel/out/arch/amr64/boot/dtbo.img AnyKernel3/
+      rm -rf AnyKernel3/.git* AnyKernel3/README.md
+      
+   - name: Upload AnyKernel3
+     if: env.CHECK_FILE_IS_OK == 'true'
+     uses: actions/upload-artifact@v3
+     with:
+      name: AnyKernel3-${{ TIME }}
+      path: build/AnyKernel3/*
