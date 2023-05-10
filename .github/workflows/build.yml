@@ -121,12 +121,22 @@ jobs:
       curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
       
    - name: Build Kernel
+     if: inputs.need_arm32 == 'false'
      run: |
       cd $GITHUB_WORKSPACE/build/kernel
       export PATH=$GITHUB_WORKSPACE/build/clang/bin:$GITHUB_WORKSPACE/build/gcc/bin:$GITHUB_WORKSPACE/build/gcc32/bin:$PATH
       make clean && make mrproper
       make -j$(nproc --all) 0=out ARCH=arm64 ${{ inputs.extra_build_cmd }} CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=$GITHUB_WORKSPACE/build/gcc/bin/{{ env.TARGET }} ${{ inputs.config }}
       make -j$(nproc --all) 0=out ARCH=arm64 ${{ inputs.extra_build_cmd }} CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=$GITHUB_WORKSPACE/build/gcc/bin/{{ env.TARGET }}
+      
+   - name: Build Kernel (Method 2)
+     if: inputs.need_arm32 == 'true'
+     run: |
+      cd $GITHUB_WORKSPACE/build/kernel
+      export PATH=$GITHUB_WORKSPACE/build/clang/bin:$GITHUB_WORKSPACE/build/gcc/bin:$GITHUB_WORKSPACE/build/gcc32/bin:$PATH
+      make clean && make mrproper
+      make -j$(nproc --all) 0=out ARCH=arm64 ${{ inputs.extra_build_cmd }} CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=$GITHUB_WORKSPACE/build/gcc/bin/{{ env.TARGET }} CROSS_COMPILE=$GITHUB_WORKSPACE/build/gcc32/bin/{{ env.TARGET32 }} ${{ inputs.config }}
+      make -j$(nproc --all) 0=out ARCH=arm64 ${{ inputs.extra_build_cmd }} CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=$GITHUB_WORKSPACE/build/gcc/bin/{{ env.TARGET }} CROSS_COMPILE=$GITHUB_WORKSPACE/build/gcc32/bin/{{ env.TARGET32 }}
       
    - name: Make Anykernel3
      run: |
