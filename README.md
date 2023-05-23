@@ -27,10 +27,10 @@ AOSP GCC應該有較高的相容性。Eva GCC版本較新，有些似乎要用�
 要使用的Clang版本，填`clang-`後面的字串。例如`clang-r487747/`，則填入`r487747`就好了。可用版本參考[這裡](https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+/refs/heads/master)，未來可能加入其他Google上游分支
 
 ### **Extra build commands**
-編譯縮需要的額外指令，不輸入可能會編譯失敗，兩個指令中間需要空格
+編譯所需要的額外指令，不輸入可能會編譯失敗，兩個指令中間需要空格
 
 ### **Add KernelSU**
 加入[KernelSU](https://kernelsu.org/)，需要先將Kprobe的相關功能開啟，或手動修補後，才使用此選項。Stable為穩定版，Dev為開發版本，不打算支援手動指定版本
 
 ### **CROSS_COMPILE_ARM32**
-有的需要加入此指令才能正常編譯
+有的需要加入此指令才能正常編譯，此功能尚未實裝
