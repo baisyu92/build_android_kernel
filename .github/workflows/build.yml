@@ -5,12 +5,12 @@ on:
    kernel_url:
     description: 'Kernel URL'
     required: true
-    default: 'https://github.com/baisyu92/kernel_xiaomi_vayu.git'
+    default: 'https://github.com/baisyu92/android_kernel_xiaomi_vayu.git'
     type: string
    branch:
     description: 'Branch'
     required: true
-    default: normal
+    default: evox-kernelsu
     type: string
    config:
     description: 'Device defconfig'
@@ -33,7 +33,7 @@ on:
    clang_ver:
     description: 'Clang version'
     required: true
-    default: 'r487747b'
+    default: 'r487747c'
     type: string
    extra_build_cmd:
     description: 'Extra build commands'
